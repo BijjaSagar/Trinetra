@@ -1,0 +1,166 @@
+{
+  "@@locale": "en",
+  "appName": "Trinetra",
+  "tagline": "Be ready before the storm.",
+  "@tagline": {
+    "description": "Exact product tagline. Keep this English string in every language."
+  },
+  "marathiLine": "संकटाआधी, तयारी.",
+  "@marathiLine": {
+    "description": "Shown under the tagline only when the app language is Marathi."
+  },
+  "logoLabel": "Trinetra logo",
+  "navHome": "Home",
+  "navReport": "Report",
+  "navPlaybook": "Playbook",
+  "navSettings": "Settings",
+  "loading": "Loading",
+  "retry": "Try again",
+  "pullToRefresh": "Pull to refresh",
+  "staleBanner": "Some figures are older than usual. The last good value is still shown.",
+  "staleFigure": "Older figure",
+  "showingSaved": "Showing the saved digest while we check.",
+  "emptyHeadline": "No digest yet",
+  "emptyBody": "Pull down to fetch today's signals.",
+  "errorTitle": "Could not refresh",
+  "errorOffline": "Saved figures are still on screen.",
+  "errorNoData": "Nothing saved yet. Check the connection and try again.",
+  "errorUnauthorized": "The API key was rejected.",
+  "errorNotConfigured": "The API address is not set for this build.",
+  "refreshCoolingDown": "Refresh is cooling down. Showing the last digest.",
+  "asOf": "As of {time}",
+  "@asOf": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "change7d": "{change} in 7 days",
+  "@change7d": {
+    "placeholders": {
+      "change": { "type": "String" }
+    }
+  },
+  "no7dChange": "No 7-day figure",
+  "noValue": "No figure",
+  "signalNormal": "Normal",
+  "signalWatch": "Watch",
+  "signalStockUp": "Stock up",
+  "signalUnknown": "Unknown",
+  "signalSemantics": "Signal: {label}",
+  "@signalSemantics": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "reasonTitle": "Why this signal",
+  "reasonNormal": "Within the usual range. Nothing to do.",
+  "reasonWatch": "Worth a look. No rush.",
+  "reasonStockUp": "A short buffer is worth having. A 2 to 4 week supply is enough.",
+  "reasonUnknown": "The signal is not recognised. The figure is still shown.",
+  "sourceLink": "Source",
+  "sourceSemantics": "Open source for {name}",
+  "@sourceSemantics": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "disclaimer": "Trinetra shares information and signals, not investment advice.",
+  "@disclaimer": {
+    "description": "Exact disclaimer. Keep this English string in every language."
+  },
+  "reportTitle": "30-day report",
+  "reportEmpty": "No 30-day history yet.",
+  "chartTooShort": "Not enough days for a chart yet.",
+  "chartSemantics": "{name}. 30-day chart. Latest {value}. Signal {level}.",
+  "@chartSemantics": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "value": { "type": "String" },
+      "level": { "type": "String" }
+    }
+  },
+  "whatMoved": "What moved",
+  "worthBuffer": "Worth a 2 to 4 week buffer",
+  "notWorthIt": "Not worth it",
+  "playbookEmpty": "The playbook is not available yet.",
+  "stepSemantics": "Step {index} of {total}",
+  "@stepSemantics": {
+    "placeholders": {
+      "index": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "language": "Language",
+  "languageEnglish": "English",
+  "languageMarathi": "मराठी",
+  "alerts": "Alerts",
+  "alertMorning": "Morning digest",
+  "alertMorningHint": "Hides the morning alert while the app is open. One summary is sent around 7:30.",
+  "alertStockUp": "New stock-up signal",
+  "alertStockUpHint": "Hides an extra stock-up alert while the app is open. At most one a day.",
+  "alertSystemNote": "To stop alerts when the app is closed, use iOS Settings.",
+  "dataHealth": "Data health",
+  "healthOk": "Sources look fine",
+  "healthAttention": "A source needs attention",
+  "healthUnavailable": "Data health is unavailable.",
+  "sourceFresh": "Fresh",
+  "sourceStale": "Stale",
+  "lastSuccess": "Last success {time}",
+  "@lastSuccess": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "noLastSuccess": "No successful fetch yet",
+  "lastError": "Last error",
+  "about": "About",
+  "versionLabel": "Version {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
+  "aboutBody": "Personal signals for one person in Solapur. Information only.",
+  "indicatorPetrol": "Petrol",
+  "indicatorDiesel": "Diesel",
+  "indicatorCrude": "Crude oil",
+  "indicatorRupee": "Rupee",
+  "indicatorEdibleOil": "Cooking oil",
+  "indicatorFood": "Food prices",
+  "indicatorGold": "Gold",
+  "indicatorSilver": "Silver",
+  "indicatorUjani": "Ujani dam",
+  "indicatorReservoirs": "Reservoirs",
+  "indicatorWater": "Solapur water",
+  "indicatorBrent": "Brent crude",
+  "indicatorIndianBasket": "Indian basket",
+  "indicatorPetrolSolapur": "Petrol, Solapur",
+  "indicatorDieselSolapur": "Diesel, Solapur",
+  "indicatorOnion": "Onion",
+  "indicatorTomato": "Tomato",
+  "indicatorWheat": "Wheat",
+  "indicatorTur": "Tur dal",
+  "indicatorGoldUsd": "Gold, USD",
+  "indicatorSilverUsd": "Silver, USD",
+  "sourceMetalsUsd": "Metals, USD",
+  "sourceFuelSolapur": "Solapur fuel",
+  "sourceNews": "News",
+  "reasonInsufficientHistory": "Not enough recent days to judge this yet.",
+  "reasonWithinThreshold": "Within the usual range. Nothing to do.",
+  "reasonCrude5": "Crude is up more than 5% in 7 days. A retail hike is more likely. Keep the tank reasonably full.",
+  "reasonCrude10": "Crude is up more than 10% in 7 days. Transport costs may rise over 1 to 3 weeks. A 2 to 4 week buffer is enough.",
+  "reasonRetailHike": "A retail fuel hike showed up. Fill the vehicle tank. Do not store fuel at home.",
+  "reasonFuelUnchanged": "The pump price has not changed.",
+  "reasonPetrolChanged": "The Solapur petrol price changed. Fill the vehicle tank. Do not store fuel at home.",
+  "reasonDieselChanged": "The Solapur diesel price changed. Transport costs may follow. Do not store fuel at home.",
+  "reasonInrWeaker": "The rupee is weaker by more than 2% over 30 days. Imported goods can cost more.",
+  "reasonFaoDutyCut": "Import duty on cooking oil was cut. No need to stock.",
+  "reasonFaoFalling": "The cooking-oil index is falling. No need to stock.",
+  "reasonFaoUp": "The cooking-oil index is up more than 3% this month, with no duty cut. A 4 week supply is enough.",
+  "reasonUjaniCut": "A water supply cut was reported. Fill drinking-water containers and check tanker days.",
+  "reasonUjani25": "Ujani is below 25% of live storage. Fill drinking-water containers and plan for tanker days.",
+  "reasonUjani40": "Ujani is below 40% of live storage in October. Store drinking water and check supply days.",
+  "reasonMetal3": "The rupee price is up more than 3% in 7 days. No rush. If you need some, spread it over several weeks.",
+  "reasonReservoirsInfo": "National reservoir level, for context.",
+  "reasonFoodInfo": "A Solapur food price, for context."
+}

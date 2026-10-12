@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Example news</title>
+    <item>
+      <title>Example desk cuts edible oil import duty</title>
+      <link>https://example.com/oil-duty</link>
+      <pubDate>Wed, 23 Sep 2026 07:00:00 GMT</pubDate>
+      <source url="https://example.com">Example</source>
+    </item>
+    <item>
+      <title>Gold imports to attract 3% IGST</title>
+      <link>https://example.com/gold-gst</link>
+      <pubDate>Thu, 08 Oct 2026 22:49:16 GMT</pubDate>
+      <source url="https://example.com/gold">Example</source>
+    </item>
+  </channel>
+</rss>

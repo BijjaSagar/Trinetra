@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+coverage/
+*.log
+.DS_Store
+apps/api/dist/
+apps/mobile/build/
+apps/mobile/.dart_tool/
+**/.dart_tool/
+**/Pods/
+*.p8
+*.pem
+.vercel/
+.railway/

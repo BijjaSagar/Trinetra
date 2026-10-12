@@ -1,0 +1,15 @@
+{
+  "response": {
+    "dateFormat": "YYYY-MM-DD",
+    "frequency": "daily",
+    "data": [
+      {
+        "period": "2026-08-28",
+        "series": "RBRTE",
+        "series-description": "Europe Brent Spot Price FOB (Dollars per Barrel)",
+        "value": "89.75",
+        "units": "$/BBL"
+      }
+    ]
+  }
+}

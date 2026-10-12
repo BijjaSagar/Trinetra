@@ -1,0 +1,2 @@
+# SYNTHETIC parser fixture. TODO(verify) the WRD bulletin format.
+Ujani live storage: 50% as of 2026-10-01

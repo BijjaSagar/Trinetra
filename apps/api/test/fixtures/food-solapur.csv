@@ -1,0 +1,6 @@
+# SYNTHETIC parser fixture. Not a Department of Consumer Affairs download. TODO(verify)
+date,indicator_key,inr_per_kg
+2026-10-12,onion_solapur_rs_kg,30
+2026-10-12,tomato_solapur_rs_kg,40
+2026-10-12,wheat_solapur_rs_kg,35
+2026-10-12,tur_solapur_rs_kg,150

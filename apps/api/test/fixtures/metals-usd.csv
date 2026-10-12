@@ -1,0 +1,5 @@
+# SYNTHETIC parser fixture. TODO(verify) a global USD metals source.
+date,key,usd_per_oz
+2026-10-05,gold_usd_oz,2600
+2026-10-12,gold_usd_oz,2650
+2026-10-12,silver_usd_oz,32

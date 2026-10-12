@@ -1,0 +1,23 @@
+# API service for the pnpm workspace. Keep the Railway root at the repository
+# root so pnpm-lock.yaml and apps/api resolve together. Do not set the root to
+# apps/api or apps/mobile.
+# The cron service uses railway.cron.toml. Set that path on the cron service only.
+
+[build]
+builder = "NIXPACKS"
+# tsc and tsx are devDependencies. --prod=false keeps them when NODE_ENV=production.
+buildCommand = "pnpm install --frozen-lockfile --prod=false && pnpm --filter @trinetra/api build"
+watchPatterns = [
+  "apps/api/**",
+  "package.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+  "tsconfig.base.json",
+  "railway.toml",
+  ".nvmrc",
+]
+
+[deploy]
+startCommand = "pnpm --filter @trinetra/api db:migrate && pnpm --filter @trinetra/api start"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5

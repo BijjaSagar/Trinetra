@@ -1,0 +1,206 @@
+---
+description: Trinetra build rules
+alwaysApply: true
+---
+
+# TRINETRA: Master Build Prompt for Cursor
+
+> Tagline (use exactly): **"Be ready before the storm."**
+
+## How to use this file
+
+1. Create a new empty folder `trinetra/`, open it in Cursor, and save this file as `PROMPT.md` in the root.
+2. Also copy it to `.cursor/rules/trinetra.mdc` (add the line `alwaysApply: true` in its frontmatter) so every chat follows it.
+3. Open Agent mode and send: `Read PROMPT.md fully, then start Phase 0. Stop after each phase and wait for my go-ahead.`
+
+---
+
+## 0. Your role and how to work
+
+You are a senior full-stack and mobile engineer building **Trinetra**, a personal iPhone app with a backend. Work in the phases listed in section 12, one phase at a time.
+
+- After each phase: run the tests, summarise what you built in 5 lines, list anything you could not verify, and **stop**.
+- Never invent data, URLs, API fields or prices. If you are not sure a source or API exists, say so, build the adapter against a saved fixture, and leave a clear `TODO(verify)` for me.
+- Never put secrets in the repo. Provide `.env.example` files only.
+- Ask me before any destructive action (deleting files, dropping tables, force pushes).
+- Prefer small, well-named files. Use strict TypeScript. Write tests for all rule logic.
+
+## 1. Product
+
+**Name:** Trinetra (त्रिनेत्र, the third eye)
+**Tagline:** "Be ready before the storm."
+**Bundle ID:** `in.rhtechnology.trinetra`
+**User:** one person (me), living in Solapur, Maharashtra, using an iPhone. Single-user for v1, no login screens.
+
+**Purpose:** Every morning at 7:30 AM IST, send a short push notification and keep an in-app report about India's import-driven price risks, so I can decide whether to stock up at home or wait. It covers:
+
+- Petrol and diesel prices and crude oil
+- USD/INR (rupee)
+- Edible oil and key food prices
+- Gold and silver (INR)
+- Water: Ujani dam level (Solapur) and national reservoir levels
+- Policy news (import duty changes, price hike announcements)
+
+**Principles (must be reflected in code and copy):**
+
+1. Trinetra gives **signals with reasons**, never buy or sell orders. Allowed signal levels: `normal`, `watch`, `stock_up`.
+2. Every number shown must be **traceable**: store and display the "as of" time and the source link.
+3. The AI summary may only restate numbers it was given. Any figure in the AI output that is not in the input must be rejected by code.
+4. Household advice is a **2 to 4 week buffer**, never panic buying. Never advise storing petrol at home.
+5. Gold and silver are decision support, not investment advice. Show a short disclaimer on report screens.
+6. The app works in **English and Marathi**.
+
+## 2. Fixed tech stack (do not substitute)
+
+| Part | Choice |
+| --- | --- |
+| Repo | Monorepo `trinetra/` with `apps/api` and `apps/mobile` (pnpm workspaces for the API side) |
+| API | Node.js 20, TypeScript (strict), Fastify, zod, pino, vitest |
+| Database | PostgreSQL on Railway, Drizzle ORM and drizzle-kit migrations |
+| AI summary | Anthropic API via `@anthropic-ai/sdk`; model name from env `CLAUDE_MODEL` |
+| Push | Apple APNs directly over HTTP/2 with token auth (.p8 key). **No Firebase, no third-party push service.** Use `apns2` or Node's built-in `http2`. |
+| Mobile | Flutter (stable), Dart null-safety, flutter_riverpod, dio, drift (or shared_preferences) for cache, fl_chart, flutter_localizations (en, mr), flutter_local_notifications |
+| Hosting | Railway: one API service, one Postgres, one cron job. Vercel only if I later ask for an admin page. |
+
+## 3. Brand and UI
+
+- Style: powerful, calm, serious. Think a watchtower, not a toy.
+- Colours: deep indigo `#1A1A4E` (primary), gold `#E8B04A` (accent), off-white `#F7F5EF` (light background), near-black `#0E0E1A` (dark background). Signal colours: green `#2E9E5B` Normal, amber `#E0A100` Watch, red `#D64545` Stock up. **Always pair colour with a word label.**
+- Light and dark mode both supported.
+- Fonts: a clean sans for English, **Noto Sans Devanagari** for Marathi.
+- Logo: a simple eye with a small flame or pulse line in the pupil. Create a placeholder SVG now; I will replace it later.
+- The tagline "Be ready before the storm." appears on: the splash screen, the Home screen footer and the Settings "About" section. Under it, show the Marathi line "संकटाआधी, तयारी." only when the app language is Marathi.
+- Tone of all copy: short, plain, calm. No hype, no fear language.
+
+## 4. Database (Drizzle schema)
+
+Create these tables with sensible indexes and `created_at` timestamps:
+
+- `devices`: id, apns_token (unique), environment (`sandbox` | `production`), language (`en` | `mr`), created_at, last_seen_at
+- `readings`: id, indicator_key, value (numeric), unit, as_of (timestamptz), source_url, fetched_at. Unique on (indicator_key, as_of).
+- `signals`: id, indicator_key, level (`normal` | `watch` | `stock_up`), reason_code, details_json, as_of
+- `digests`: id, digest_date (date, unique), summary_en, summary_mr, signals_json, push_sent_at (nullable)
+- `playbooks`: id, topic (`fuel_hike` | `food_spike` | `water_cut` | `gold_volatility`), title_en, title_mr, steps_en (json array), steps_mr (json array)
+
+Indicator keys to start with: `brent_usd`, `indian_basket_usd`, `petrol_solapur`, `diesel_solapur`, `usd_inr`, `fao_veg_oil_index`, `gold_inr_10g`, `silver_inr_kg`, `ujani_pct`, `cwc_national_pct`, plus food price keys decided in Phase 1.
+
+## 5. Data fetchers (adapter pattern)
+
+Create `apps/api/src/fetchers/` with one file per source and a shared interface:
+
+```ts
+export interface Reading { key: string; value: number; unit: string; asOf: Date; sourceUrl: string }
+export interface Fetcher { key: string; fetch(): Promise<Reading[]> }
+```
+
+Rules:
+
+- Each fetcher is wrapped in try/catch with a timeout. A failure must **never** stop the daily job. Keep the last good reading and mark that indicator `stale` in `/health`.
+- Candidate sources (research the current official page or API for each, and tell me what you found before relying on it): petrol/diesel city prices (PPAC or oil company pages), Brent crude (US EIA free API), USD/INR (RBI reference rate or a free forex API), FAO Vegetable Oil Price Index, gold and silver INR (IBJA rates or a metals API), Ujani dam storage (Maharashtra Water Resources Department daily report), Central Water Commission weekly bulletin, Google News RSS for the policy-news queries "India import duty", "Solapur water supply", "petrol price hike".
+- Store a saved fixture for every source in `apps/api/test/fixtures/` and write parser tests against them.
+- Never scrape in a way that violates a site's terms. If a source is unsuitable, tell me and propose an alternative.
+
+## 6. Signal engine
+
+Put thresholds in one file, `src/rules/rules.config.ts`, so I can tune them. Rules are plain functions that take recent readings and return a signal, fully unit-tested including threshold edge cases. Starting values:
+
+| Indicator | Trigger | Level |
+| --- | --- | --- |
+| Crude (Brent or Indian basket) | up more than 5% in 7 days | `watch` |
+| Crude | up more than 10% in 7 days, or a retail price hike is detected | `stock_up` |
+| Petrol or diesel (Solapur) | any change | `stock_up` |
+| USD/INR | rupee weaker by more than 2% in 30 days | `watch` |
+| FAO vegetable oil index | up more than 3% in a month and no import duty cut | `stock_up` |
+| FAO vegetable oil index | duty cut, or index falling | `normal` |
+| Ujani dam | below 40% of live storage in October | `watch` |
+| Ujani dam | below 25%, or a supply cut announced | `stock_up` |
+| Gold or silver (INR) | up more than 3% in 7 days | `watch` |
+
+For gold and silver also store the three drivers (global USD price change, USD/INR change, any import duty or GST news) so the app can show which one moved.
+
+## 7. Daily digest with Claude
+
+- Input: structured JSON of today's readings, 7 and 30 day changes, signals, and up to 8 news headlines.
+- Output (JSON, validated with zod): `{ headline_en, headline_mr, summary_en, summary_mr, push_title_en, push_title_mr, push_body_en, push_body_mr }`. Push body is at most 120 characters, and the first line is the most important signal.
+- The system prompt must say: only use numbers from the input, never say "buy" or "sell", keep a calm tone, and mention the 2 to 4 week buffer rule when the level is `stock_up`.
+- **Number check:** extract every number from the AI text and reject the digest if any number is not present in the input (with sensible rounding). On failure retry once, then fall back to a template-based digest built in code.
+- Keep the Marathi natural and simple. Flag Marathi strings for my review.
+
+## 8. Direct APNs push
+
+- Env vars: `APNS_KEY_P8` (base64 of the .p8 contents), `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_BUNDLE_ID`.
+- Sign a JWT (ES256) with the .p8 key. Cache it and refresh about every 40 minutes. Apple rejects tokens older than an hour and also rejects tokens refreshed too often.
+- Hosts: `api.sandbox.push.apple.com` for `environment=sandbox` devices (debug builds) and `api.push.apple.com` for `production` (TestFlight and App Store). Pick the host per device.
+- Headers: `apns-topic` = bundle ID, `apns-push-type: alert`, `apns-priority: 10`. Body: `aps.alert.title`, `aps.alert.body`, `aps.sound: default`, plus custom key `digest_date`.
+- On Apple status 410 or reason `BadDeviceToken` or `Unregistered`, delete that device.
+- Provide a script `pnpm push:test` that sends one test push to a token I pass in.
+- A push is sent once per day after the digest is saved. At most one extra push per day when a `stock_up` signal first appears.
+
+## 9. API (Fastify)
+
+Auth: every request needs header `X-API-Key` matching env `API_KEY`. Add rate limiting by IP. Validate everything with zod.
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /devices` | Body `{ apnsToken, environment, language }`. Upsert and update `last_seen_at`. |
+| `GET /digest/latest` | Latest digest plus current signals, each with value, unit, 7-day change, as-of time, source URL and stale flag. |
+| `GET /signals/history?days=30` | Time series per indicator for charts. |
+| `POST /refresh` | Re-run fetchers and rules only if the latest data is older than 6 hours. Rate limited. Returns the new digest data. |
+| `GET /health` | Per-source freshness and last error. |
+| `GET /playbooks` | Playbook cards in the requested language. |
+
+## 10. Flutter app
+
+Folder layout: `lib/core` (api client, cache, theme, l10n), `lib/features/home`, `report`, `playbook`, `settings`.
+
+Screens:
+
+- **Splash:** logo, name and the tagline "Be ready before the storm."
+- **Home:** today's headline, then one card per indicator showing signal chip (colour plus word), value, 7-day change and "as of" time. Pull-to-refresh calls `POST /refresh` then reloads. Show the cached digest instantly on open. If data is stale, show a clear banner. Footer shows the tagline.
+- **Report:** 30-day charts (fl_chart), the reason behind each signal, source links, and the disclaimer text: "Trinetra shares information and signals, not investment advice."
+- **Playbook:** "Worth a 2 to 4 week buffer" and "Not worth it" lists, plus crisis cards (fuel hike, food spike, water cut), each with 4 to 6 action steps. Draft the first version in English and Marathi, and flag it for my review.
+- **Settings:** language toggle (English/Marathi), alert toggles, data-health view from `/health`, About with version and tagline.
+
+Push on iOS (no Firebase):
+
+- Add Push Notifications and Background Modes (Remote notifications) capabilities.
+- In `AppDelegate.swift` call `registerForRemoteNotifications`, capture the device token, and send it to Dart through a `MethodChannel`. (You may use a maintained APNs-only Flutter package instead, but verify it is maintained first and tell me.)
+- On every launch, POST the token, environment and language to `/devices`. Detect sandbox versus production from the build configuration.
+- Show the notification when the app is in the foreground using flutter_local_notifications. Tapping a notification opens Home.
+
+## 11. Deployment on Railway
+
+- Services: `api` (Fastify, `pnpm start`), `postgres`, and a cron job running `pnpm job:daily` with schedule `0 2 * * *` (this is 02:00 UTC, which is **7:30 AM IST**).
+- `job:daily` does: fetch all sources, compute signals, build the digest, save it, send pushes, exit. It must be safe to run twice (idempotent per date).
+- Add a `--dry-run` flag that prints the digest and the push text without sending. Use dry-run for the first week.
+- If every source fails or the digest cannot be built, send me a "data is stale" push instead of staying silent.
+- Provide `.env.example` listing: `DATABASE_URL`, `API_KEY`, `ANTHROPIC_API_KEY`, `CLAUDE_MODEL`, `EIA_API_KEY`, `APNS_KEY_P8`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_BUNDLE_ID`, `TZ=Asia/Kolkata`.
+- Write a `README.md` with local setup, migration commands, how to run the job, how to test push, and how to deploy.
+
+## 12. Phases (stop after each one)
+
+| Phase | Build | Done when |
+| --- | --- | --- |
+| 0 Setup | Monorepo, TypeScript, lint, Drizzle schema and migrations, Fastify skeleton with `/health`, Flutter project with splash screen and theme, `.env.example`, README, `push:test` script | API runs locally, migrations apply, `push:test` sends a push to my iPhone |
+| 1 Data | Fetchers for fuel, crude, USD/INR and Ujani dam with fixtures and tests, store readings, `/health` shows freshness | Real readings are stored when I run the job |
+| 2 Signals | Rules config and tests, remaining fetchers (gold, silver, edible oil, food, news), Claude digest with number check and fallback, `--dry-run` | A full digest prints from live data |
+| 3 App | Home, Report, Playbook, Settings, caching, pull-to-refresh, English and Marathi | The app shows live data on my iPhone |
+| 4 Push | Token registration, APNs sender, Railway cron job, stale-data alert | I get the 7:30 AM IST push three days in a row |
+| 5 Launch | TestFlight build, threshold tuning notes, polish, README update | Two weeks of daily use with no missed digest |
+
+## 13. Quality rules
+
+- TypeScript strict mode, ESLint and Prettier, no `any` unless justified.
+- Every rule and parser has a test. Run the tests before you say a phase is done.
+- Structured logs (pino) with no secrets and no full push tokens in logs.
+- Handle timezones explicitly: store UTC, display and schedule in `Asia/Kolkata`.
+- Accessible UI: minimum 4.5:1 text contrast, scalable text, labels on every control.
+- Commit in small steps with clear messages.
+
+## 14. Out of scope for v1
+
+Android, user accounts, payments, a public App Store release, trading or portfolio features, WhatsApp integration.
+
+## 15. Start now
+
+Begin **Phase 0**. First list the exact files you will create, ask me any blocking questions in one message, then build it and stop with the phase summary.

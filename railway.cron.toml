@@ -1,0 +1,22 @@
+# Cron service. In Railway, set this file as the config-as-code path for the
+# cron service. Leave railway.toml on the API service.
+# Schedule is 02:00 UTC, which is 7:30 AM IST. The job is idempotent per date.
+
+[build]
+builder = "NIXPACKS"
+# The daily job runs through tsx, which is a devDependency.
+buildCommand = "pnpm install --frozen-lockfile --prod=false"
+watchPatterns = [
+  "apps/api/**",
+  "package.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+  "tsconfig.base.json",
+  "railway.cron.toml",
+  ".nvmrc",
+]
+
+[deploy]
+startCommand = "pnpm job:daily"
+cronSchedule = "0 2 * * *"
+restartPolicyType = "NEVER"

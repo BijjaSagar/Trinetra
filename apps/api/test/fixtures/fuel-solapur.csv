@@ -1,0 +1,4 @@
+# SYNTHETIC parser fixture. Not a Solapur retail price. TODO(verify)
+date,petrol_inr_per_l,diesel_inr_per_l
+2026-10-11,100.00,90.00
+2026-10-12,101.50,90.00

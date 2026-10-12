@@ -1,0 +1,20 @@
+{
+  "name": "trinetra",
+  "private": true,
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm --filter @trinetra/api build",
+    "start": "pnpm --filter @trinetra/api start",
+    "dev": "pnpm --filter @trinetra/api dev",
+    "test": "pnpm --filter @trinetra/api test",
+    "typecheck": "pnpm --filter @trinetra/api typecheck",
+    "lint": "pnpm --filter @trinetra/api lint",
+    "job:daily": "pnpm --filter @trinetra/api exec tsx src/jobs/daily.ts",
+    "push:test": "pnpm --filter @trinetra/api exec tsx src/push/push-test.ts",
+    "db:migrate": "pnpm --filter @trinetra/api db:migrate",
+    "db:generate": "pnpm --filter @trinetra/api db:generate"
+  }
+}

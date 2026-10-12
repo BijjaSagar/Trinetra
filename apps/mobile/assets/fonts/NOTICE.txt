@@ -1,0 +1,8 @@
+Source Sans 3
+Copyright 2010-2020 Adobe, with Reserved Font Name "Source".
+Licensed under the SIL Open Font License, Version 1.1. See OFL.txt.
+
+Noto Sans Devanagari
+Copyright 2022 The Noto Project Authors.
+Licensed under the SIL Open Font License, Version 1.1.
+https://scripts.sil.org/OFL

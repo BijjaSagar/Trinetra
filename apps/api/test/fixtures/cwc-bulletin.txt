@@ -1,0 +1,2 @@
+as_of: 2021-10-07
+live storage available in these reservoirs is 141.555 BCM, which is 82% of total live storage capacity of these reservoirs.
