@@ -1,0 +1,15 @@
+# Railway's default image picked Node 24. Corepack on that image cannot start
+# pnpm 11.7.0. This repo is Node 20 (.nvmrc) and pnpm 11.7.0 (package.json).
+
+[variables]
+NIXPACKS_NODE_VERSION = "20"
+
+[phases.install]
+cmds = [
+  "corepack disable || true",
+  "npm install -g pnpm@11.7.0",
+  "pnpm install --frozen-lockfile --prod=false",
+]
+
+[phases.build]
+cmds = ["pnpm --filter @trinetra/api build"]

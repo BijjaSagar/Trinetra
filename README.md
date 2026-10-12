@@ -73,6 +73,8 @@ Railway runs the product. Vercel serves a one-page public site and does not buil
 
 Keep the Railway root at the repository root. The workspace lockfile lives there. Do not point Railway at `apps/api` or `apps/mobile`.
 
+`nixpacks.toml` pins Node 20 and installs pnpm 11.7.0 with npm. Railway's default Node 24 image cannot start that pnpm through Corepack.
+
 - API start: `pnpm --filter @trinetra/api db:migrate && pnpm --filter @trinetra/api start`
 - Cron command: `pnpm job:daily`
 - Cron schedule: `0 2 * * *` (02:00 UTC, 7:30 AM IST)
