@@ -1,4 +1,4 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, gte, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import type {
   ApnsEnvironment,
@@ -119,10 +119,12 @@ export class PostgresStore implements DataStore {
   }
 
   async listReadingsSince(since: Date): Promise<ReadingRecord[]> {
+    // gte() encodes the Date as an ISO string. A raw sql`... ${since}` passes
+    // the Date object through, and postgres.js rejects it with ERR_INVALID_ARG_TYPE.
     const rows = await this.db
       .select()
       .from(readings)
-      .where(sql`${readings.asOf} >= ${since}`)
+      .where(gte(readings.asOf, since))
       .orderBy(readings.asOf);
     return rows.map(mapReading);
   }
@@ -158,7 +160,7 @@ export class PostgresStore implements DataStore {
     const rows = await this.db
       .select()
       .from(signals)
-      .where(sql`${signals.asOf} >= ${since}`);
+      .where(gte(signals.asOf, since));
     return rows.map((row) => ({
       id: row.id,
       indicatorKey: row.indicatorKey,

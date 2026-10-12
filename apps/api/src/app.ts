@@ -2,6 +2,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import rateLimit from "@fastify/rate-limit";
 import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
+import { logger } from "./logger.js";
 import type { DataStore } from "./db/types.js";
 import { MS_PER_HOUR } from "./domain/time.js";
 import { healthPayload, historyPayload, latestPayload, playbookPayload } from "./routes/present.js";
@@ -39,7 +40,10 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   });
 
   app.setErrorHandler((error, request, reply) => {
-    request.log.error({ err: error }, "request failed");
+    logger.error(
+      { err: error, method: request.method, path: request.url.split("?")[0] },
+      "request failed",
+    );
     const status =
       typeof error === "object" &&
       error !== null &&
