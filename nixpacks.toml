@@ -1,14 +1,13 @@
-# Railway's default image picked Node 24. Corepack on that image cannot start
-# pnpm 11.7.0. This repo is Node 20 (.nvmrc) and pnpm 11.7.0 (package.json).
+# pnpm 11.7.0 requires Node >= 22.13. Railway's default Node 24 image starts
+# that pnpm through an old Corepack and crashes, so install pnpm with npm
+# and leave a binary on PATH for the later build and start steps.
 
 [variables]
-NIXPACKS_NODE_VERSION = "20"
+NIXPACKS_NODE_VERSION = "22"
 
 [phases.install]
 cmds = [
-  "corepack disable || true",
-  "npm install -g pnpm@11.7.0",
-  "pnpm install --frozen-lockfile --prod=false",
+  "corepack disable || true && npm install -g pnpm@11.7.0 && ln -sfn \"$(npm prefix -g)/bin/pnpm\" /usr/local/bin/pnpm && ln -sfn \"$(npm prefix -g)/bin/pnpm\" /usr/bin/pnpm && pnpm install --frozen-lockfile --prod=false",
 ]
 
 [phases.build]
